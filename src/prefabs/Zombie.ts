@@ -9,10 +9,10 @@ export interface IZombieData {
 }
 
 export default class Zombie extends Phaser.Sprite {
+  public attack: number;
   public body: Phaser.Physics.Arcade.Body;
+  public defaultVelocity: number;
   private animationName: string;
-  private attack: number;
-  private defaultVelocity: number;
   private state: Game;
 
   constructor(state: Game, x: number, y: number, data: IZombieData) {

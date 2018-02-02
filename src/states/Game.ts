@@ -8,6 +8,7 @@ export default class Game extends Phaser.State {
   private currentLevel: string;
   private plants: Phaser.Group;
   private zombies: Phaser.Group;
+  private readonly HOUSE_X = 60;
 
   public init(currentLevel: string) {
     this.currentLevel = currentLevel ? currentLevel : 'level1';
@@ -44,7 +45,19 @@ export default class Game extends Phaser.State {
   }
 
   public update() {
+    this.physics.arcade.collide(this.plants, this.zombies, this.attackPlant, undefined, this);
 
+    this.zombies.forEachAlive((zombie: Zombie) => {
+      zombie.body.velocity.x = zombie.defaultVelocity;
+
+      if (zombie.x <= this.HOUSE_X) {
+        this.gameOver();
+      }
+    }, this);
+  }
+
+  private attackPlant(plant: Plant, zombie: Zombie) {
+    plant.damage(zombie.attack);
   }
 
   private gameOver() {
