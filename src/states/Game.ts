@@ -60,6 +60,32 @@ export default class Game extends Phaser.State {
     plant.damage(zombie.attack);
   }
 
+  private createPlant(x: number, y: number, data: IPlantData) {
+    let newElement: Plant = this.plants.getFirstDead();
+
+    if (!newElement) {
+      newElement = new Plant(this, x, y, data);
+      this.plants.add(newElement);
+    } else {
+      newElement.resetData(x, y, data);
+    }
+
+    return newElement;
+  }
+
+  private createZombie(x: number, y: number, data: IZombieData) {
+    let newElement: Zombie = this.zombies.getFirstDead();
+
+    if (!newElement) {
+      newElement = new Zombie(this, x, y, data);
+      this.zombies.add(newElement);
+    } else {
+      newElement.resetData(x, y, data);
+    }
+
+    return newElement;
+  }
+
   private gameOver() {
     this.state.start('Game');
   }
