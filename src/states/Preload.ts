@@ -23,7 +23,7 @@ export default class Preload extends Phaser.State {
 
     this.load.audio('hit', ['audio/hit.mp3', 'audio/hit.ogg']);
 
-    this.load.text('buttonDate', 'data/buttons.json');
+    this.load.text('buttonData', 'data/buttons.json');
     this.load.text('level1', 'data/level1.json');
     this.load.text('level2', 'data/level2.json');
   }

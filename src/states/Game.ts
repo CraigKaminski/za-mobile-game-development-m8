@@ -7,6 +7,8 @@ export default class Game extends Phaser.State {
   public bullets: Phaser.Group;
   public suns: Phaser.Group;
   private background: Phaser.Sprite;
+  private buttonData: any;
+  private buttons: Phaser.Group;
   private currentLevel: string;
   private hitSound: Phaser.Sound;
   private numSuns = 100;
@@ -98,6 +100,10 @@ export default class Game extends Phaser.State {
     plant.damage(zombie.attack);
   }
 
+  private clickButton(button: Phaser.Button) {
+    console.log(button.data);
+  }
+
   private createGui() {
     const sun = this.add.sprite(10, this.game.height - 20, 'sun');
     sun.anchor.setTo(0.5);
@@ -110,6 +116,18 @@ export default class Game extends Phaser.State {
     this.sunLabel = this.add.text(22, this.game.height - 28, '', style);
 
     this.updateStats();
+
+    this.buttonData = JSON.parse(this.cache.getText('buttonData'));
+
+    this.buttons = this.add.group();
+
+    let button: Phaser.Button;
+    this.buttonData.forEach((element: any, index: number) => {
+      button = new Phaser.Button(this.game, 80 + index * 40, this.game.height - 35,
+        element.btnAsset, this.clickButton, this);
+      this.buttons.add(button);
+      button.data = element;
+    });
   }
 
   private createPlant(x: number, y: number, data: IPlantData) {
