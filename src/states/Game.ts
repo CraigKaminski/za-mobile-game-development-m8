@@ -44,10 +44,11 @@ export default class Game extends Phaser.State {
     this.zombies.add(zombie);
 
     const plantData: IPlantData = {
-      animationFrames: [1, 2, 1, 0],
+      animationFrames: [],
       health: 10,
-      isShooter: true,
-      plantAsset: 'plant',
+      isShooter: false,
+      isSunProducer: true,
+      plantAsset: 'sunflower',
     };
 
     const plant = new Plant(this, 100, 100, plantData);
@@ -56,6 +57,19 @@ export default class Game extends Phaser.State {
     this.sunGenerationTimer = this.game.time.create(false);
     this.sunGenerationTimer.start();
     this.scheduleSunGeneration();
+  }
+
+  public createSun(x: number, y: number) {
+    let newElement: Sun = this.suns.getFirstDead();
+
+    if (!newElement) {
+      newElement = new Sun(this, x, y);
+      this.suns.add(newElement);
+    } else {
+      newElement.reset(x, y);
+    }
+
+    return newElement;
   }
 
   public increaseSun(amount: number) {
@@ -101,19 +115,6 @@ export default class Game extends Phaser.State {
       this.plants.add(newElement);
     } else {
       newElement.resetData(x, y, data);
-    }
-
-    return newElement;
-  }
-
-  private createSun(x: number, y: number) {
-    let newElement: Sun = this.suns.getFirstDead();
-
-    if (!newElement) {
-      newElement = new Sun(this, x, y);
-      this.suns.add(newElement);
-    } else {
-      newElement.reset(x, y);
     }
 
     return newElement;

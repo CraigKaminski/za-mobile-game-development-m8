@@ -5,6 +5,7 @@ export interface IPlantData {
   animationFrames: number[];
   health: number;
   isShooter: boolean;
+  isSunProducer: boolean;
   plantAsset: string;
 }
 
@@ -13,6 +14,7 @@ export default class Plant extends Phaser.Sprite {
   private animationName: string;
   private bullets: Phaser.Group;
   private isShooter: boolean;
+  private isSunProducer: boolean;
   private producingTimer: Phaser.Timer;
   private shootingTimer: Phaser.Timer;
   private state: Game;
@@ -55,13 +57,32 @@ export default class Plant extends Phaser.Sprite {
     }
 
     this.isShooter = data.isShooter;
+    this.isSunProducer = data.isSunProducer;
 
     if (this.isShooter) {
       this.shootingTimer.start();
       this.scheduleShooting();
     }
 
+    if (this.isSunProducer) {
+      this.producingTimer.start();
+      this.scheduleProduction();
+    }
+
     return this;
+  }
+
+  private produceSun() {
+    const diffX = -40 + Math.random() * 80;
+    const diffY = -40 + Math.random() * 80;
+
+    this.state.createSun(this.x + diffX, this.y + diffY);
+  }
+
+  private scheduleProduction() {
+    this.produceSun();
+
+    this.producingTimer.add(Phaser.Timer.SECOND * 2, this.scheduleProduction, this);
   }
 
   private scheduleShooting() {
