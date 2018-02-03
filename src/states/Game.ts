@@ -36,7 +36,9 @@ export default class Game extends Phaser.State {
     this.zombies.add(zombie);
 
     const plantData: IPlantData = {
+      animationFrames: [1, 2, 1, 0],
       health: 10,
+      isShooter: true,
       plantAsset: 'plant',
     };
 
