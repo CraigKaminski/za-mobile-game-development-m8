@@ -20,7 +20,7 @@ export default class Sun extends Phaser.Sprite {
     this.inputEnabled = true;
     this.input.pixelPerfectClick = true;
     this.events.onInputDown.add(() => {
-      console.log('sun collected');
+      this.state.increaseSun(25);
 
       this.kill();
     });

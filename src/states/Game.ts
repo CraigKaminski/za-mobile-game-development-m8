@@ -6,7 +6,9 @@ export default class Game extends Phaser.State {
   public suns: Phaser.Group;
   private background: Phaser.Sprite;
   private currentLevel: string;
+  private numSuns = 100;
   private plants: Phaser.Group;
+  private sunLabel: Phaser.Text;
   private zombies: Phaser.Group;
   private readonly HOUSE_X = 60;
 
@@ -23,6 +25,8 @@ export default class Game extends Phaser.State {
     this.plants = this.add.group();
     this.suns = this.add.group();
     this.zombies = this.add.group();
+
+    this.createGui();
 
     const zombieData: IZombieData = {
       animationFrames: [0, 1, 2, 1],
@@ -46,6 +50,11 @@ export default class Game extends Phaser.State {
     this.plants.add(plant);
   }
 
+  public increaseSun(amount: number) {
+    this.numSuns += amount;
+    this.updateStats();
+  }
+
   public update() {
     this.physics.arcade.collide(this.plants, this.zombies, this.attackPlant, undefined, this);
 
@@ -60,6 +69,20 @@ export default class Game extends Phaser.State {
 
   private attackPlant(plant: Plant, zombie: Zombie) {
     plant.damage(zombie.attack);
+  }
+
+  private createGui() {
+    const sun = this.add.sprite(10, this.game.height - 20, 'sun');
+    sun.anchor.setTo(0.5);
+    sun.scale.setTo(0.5);
+
+    const style = {
+      fill: '#fff',
+      font: '14px Arial',
+    };
+    this.sunLabel = this.add.text(22, this.game.height - 28, '', style);
+
+    this.updateStats();
   }
 
   private createPlant(x: number, y: number, data: IPlantData) {
@@ -90,5 +113,9 @@ export default class Game extends Phaser.State {
 
   private gameOver() {
     this.state.start('Game');
+  }
+
+  private updateStats() {
+    this.sunLabel.text = this.numSuns.toString();
   }
 }
