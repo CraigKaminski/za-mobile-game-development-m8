@@ -37,10 +37,12 @@ export default class Sun extends Phaser.Sprite {
     return this;
   }
 
-  public reset(x: number, y: number) {
+  public reset(x: number, y: number, health?: number | undefined) {
     super.reset(x, y);
 
     this.scheduleExpiration();
+
+    return this;
   }
 
   private scheduleExpiration() {
