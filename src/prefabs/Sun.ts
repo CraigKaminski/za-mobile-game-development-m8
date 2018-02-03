@@ -50,7 +50,7 @@ export default class Sun extends Phaser.Sprite {
 
     this.sunExpirationTimer.start();
 
-    this.sunExpirationTimer.add(Phaser.Timer.SECOND + expirationTime, () => {
+    this.sunExpirationTimer.add(Phaser.Timer.SECOND * expirationTime, () => {
       this.kill();
     });
   }
