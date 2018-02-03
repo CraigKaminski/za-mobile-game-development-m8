@@ -26,6 +26,24 @@ export default class Zombie extends Phaser.Sprite {
     this.resetData(x, y, data);
   }
 
+  public damage(amount: number) {
+    super.damage(amount);
+
+    const emitter = this.game.add.emitter(this.x, this.y, 50);
+    emitter.makeParticles('bloodParticle');
+    emitter.minParticleSpeed.setTo(-100, -100);
+    emitter.maxParticleSpeed.setTo(100, 100);
+    emitter.gravity.y = 300;
+    emitter.start(true, 200, undefined, 100);
+
+    if (this.health <= 0) {
+      const corpse = this.game.add.sprite(this.x, this.bottom, 'deadZombie');
+      corpse.anchor.setTo(0.5, 1);
+    }
+
+    return this;
+  }
+
   public resetData(x: number, y: number, data: IZombieData) {
     super.reset(x, y, data.health);
 

@@ -1,3 +1,4 @@
+import Bullet from '../prefabs/Bullet';
 import Plant, { IPlantData } from '../prefabs/Plant';
 import Sun from '../prefabs/Sun';
 import Zombie, { IZombieData } from '../prefabs/Zombie';
@@ -7,6 +8,7 @@ export default class Game extends Phaser.State {
   public suns: Phaser.Group;
   private background: Phaser.Sprite;
   private currentLevel: string;
+  private hitSound: Phaser.Sound;
   private numSuns = 100;
   private plants: Phaser.Group;
   private sunGenerationTimer: Phaser.Timer;
@@ -44,11 +46,11 @@ export default class Game extends Phaser.State {
     this.zombies.add(zombie);
 
     const plantData: IPlantData = {
-      animationFrames: [],
+      animationFrames: [1, 2, 1, 0],
       health: 10,
-      isShooter: false,
-      isSunProducer: true,
-      plantAsset: 'sunflower',
+      isShooter: true,
+      isSunProducer: false,
+      plantAsset: 'plant',
     };
 
     const plant = new Plant(this, 100, 100, plantData);
@@ -57,6 +59,8 @@ export default class Game extends Phaser.State {
     this.sunGenerationTimer = this.game.time.create(false);
     this.sunGenerationTimer.start();
     this.scheduleSunGeneration();
+
+    this.hitSound = this.add.audio('hit');
   }
 
   public createSun(x: number, y: number) {
@@ -79,6 +83,7 @@ export default class Game extends Phaser.State {
 
   public update() {
     this.physics.arcade.collide(this.plants, this.zombies, this.attackPlant, undefined, this);
+    this.physics.arcade.collide(this.bullets, this.zombies, this.hitZombi, undefined, this);
 
     this.zombies.forEachAlive((zombie: Zombie) => {
       zombie.body.velocity.x = zombie.defaultVelocity;
@@ -143,6 +148,12 @@ export default class Game extends Phaser.State {
 
     const sun = this.createSun(x, y);
     sun.body.velocity.y = this.SUN_VELOCITY;
+  }
+
+  private hitZombi(bullet: Bullet, zombie: Zombie) {
+    bullet.kill();
+    this.hitSound.play();
+    zombie.damage(1);
   }
 
   private scheduleSunGeneration() {
