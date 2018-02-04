@@ -9,9 +9,14 @@ export default class Game extends Phaser.State {
   private background: Phaser.Sprite;
   private buttonData: any;
   private buttons: Phaser.Group;
+  private currentEnemyIndex: number;
   private currentLevel: string;
   private currentSelection: any;
   private hitSound: Phaser.Sound;
+  private killedEnemies: number;
+  private levelData: any;
+  private nextEnemyTimer: Phaser.TimerEvent;
+  private numEnemies: number;
   private numSuns = 100;
   private patches: Phaser.Group;
   private plantLabel: Phaser.Text;
@@ -22,6 +27,7 @@ export default class Game extends Phaser.State {
   private readonly HOUSE_X = 60;
   private readonly SUN_FREQUENCY = 5;
   private readonly SUN_VELOCITY = 50;
+  private readonly ZOMBIE_Y_POSITIONS = [49, 99, 149, 199, 249];
 
   public init(currentLevel: string) {
     this.currentLevel = currentLevel ? currentLevel : 'level1';
@@ -49,9 +55,6 @@ export default class Game extends Phaser.State {
       velocity: -20,
     };
 
-    const zombie = new Zombie(this, 300, 100, zombieData);
-    this.zombies.add(zombie);
-
     const plantData: IPlantData = {
       animationFrames: [1, 2, 1, 0],
       health: 10,
@@ -65,6 +68,8 @@ export default class Game extends Phaser.State {
     this.scheduleSunGeneration();
 
     this.hitSound = this.add.audio('hit');
+
+    this.loadLevel();
   }
 
   public createSun(x: number, y: number) {
@@ -225,6 +230,16 @@ export default class Game extends Phaser.State {
     zombie.damage(1);
   }
 
+  private loadLevel() {
+    this.levelData = JSON.parse(this.cache.getText(this.currentLevel));
+
+    this.currentEnemyIndex = 0;
+
+    this.killedEnemies = 0;
+    this.numEnemies = this.levelData.zombies.length;
+    this.scheduleNextEnemy();
+  }
+
   private plantPlant(patch: Phaser.Sprite) {
     if (!patch.data.isBusy && this.currentSelection) {
       patch.data.isBusy = true;
@@ -234,6 +249,24 @@ export default class Game extends Phaser.State {
 
       this.increaseSun(-this.currentSelection.cost);
       this.clearSelection();
+    }
+  }
+
+  private scheduleNextEnemy() {
+    const nextEnemy = this.levelData.zombies[this.currentEnemyIndex];
+
+    if (nextEnemy) {
+      const nextTime = 1000 * (nextEnemy.time -
+        (this.currentEnemyIndex === 0 ? 0 : this.levelData.zombies[this.currentEnemyIndex - 1].time));
+
+      this.nextEnemyTimer = this.time.events.add(nextTime, () => {
+        const y = this.ZOMBIE_Y_POSITIONS[Math.floor(Math.random() * this.ZOMBIE_Y_POSITIONS.length)];
+
+        this.createZombie(this.world.width + 40, y, nextEnemy);
+
+        this.currentEnemyIndex++;
+        this.scheduleNextEnemy();
+      }, this);
     }
   }
 
