@@ -10,8 +10,10 @@ export default class Game extends Phaser.State {
   private buttonData: any;
   private buttons: Phaser.Group;
   private currentLevel: string;
+  private currentSelection: any;
   private hitSound: Phaser.Sound;
   private numSuns = 100;
+  private plantLabel: Phaser.Text;
   private plants: Phaser.Group;
   private sunGenerationTimer: Phaser.Timer;
   private sunLabel: Phaser.Text;
@@ -100,8 +102,32 @@ export default class Game extends Phaser.State {
     plant.damage(zombie.attack);
   }
 
+  private clearSelection() {
+    this.plantLabel.text = '';
+    this.currentSelection = null;
+
+    this.buttons.forEach((button: Phaser.Button) => {
+      button.alpha = 1;
+      button.data.selected = false;
+    }, this);
+  }
+
   private clickButton(button: Phaser.Button) {
-    console.log(button.data);
+    if (!button.data.selected) {
+      this.clearSelection();
+      this.plantLabel.text = 'Cost: ' + button.data.cost;
+
+      if (this.numSuns >= button.data.cost) {
+        button.data.selected = true;
+        button.alpha = 0.5;
+
+        this.currentSelection = button.data;
+      } else {
+        this.plantLabel.text += ' - Too expensive!';
+      }
+    } else {
+      this.clearSelection();
+    }
   }
 
   private createGui() {
@@ -128,6 +154,8 @@ export default class Game extends Phaser.State {
       this.buttons.add(button);
       button.data = element;
     });
+
+    this.plantLabel = this.add.text(300, this.game.height - 28, '', style);
   }
 
   private createPlant(x: number, y: number, data: IPlantData) {
