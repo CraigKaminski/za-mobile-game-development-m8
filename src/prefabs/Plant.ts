@@ -15,12 +15,13 @@ export default class Plant extends Phaser.Sprite {
   private bullets: Phaser.Group;
   private isShooter: boolean;
   private isSunProducer: boolean;
+  private patch: Phaser.Sprite;
   private producingTimer: Phaser.Timer;
   private shootingTimer: Phaser.Timer;
   private state: Game;
   private suns: Phaser.Group;
 
-  constructor(state: Game, x: number, y: number, data: IPlantData) {
+  constructor(state: Game, x: number, y: number, data: IPlantData, patch: Phaser.Sprite) {
     super(state.game, x, y, data.plantAsset);
 
     this.bullets = state.bullets;
@@ -34,7 +35,7 @@ export default class Plant extends Phaser.Sprite {
     this.producingTimer = this.game.time.create(false);
     this.shootingTimer = this.game.time.create(false);
 
-    this.resetData(x, y, data);
+    this.resetData(x, y, data, patch);
   }
 
   public kill() {
@@ -42,11 +43,12 @@ export default class Plant extends Phaser.Sprite {
 
     this.producingTimer.stop();
     this.shootingTimer.stop();
+    this.patch.data.isBusy = false;
 
     return this;
   }
 
-  public resetData(x: number, y: number, data: IPlantData) {
+  public resetData(x: number, y: number, data: IPlantData, patch: Phaser.Sprite) {
     super.reset(x, y, data.health);
 
     this.loadTexture(data.plantAsset);
@@ -58,6 +60,7 @@ export default class Plant extends Phaser.Sprite {
 
     this.isShooter = data.isShooter;
     this.isSunProducer = data.isSunProducer;
+    this.patch = patch;
 
     if (this.isShooter) {
       this.shootingTimer.start();
@@ -82,7 +85,7 @@ export default class Plant extends Phaser.Sprite {
   private scheduleProduction() {
     this.produceSun();
 
-    this.producingTimer.add(Phaser.Timer.SECOND * 2, this.scheduleProduction, this);
+    this.producingTimer.add(Phaser.Timer.SECOND * 5, this.scheduleProduction, this);
   }
 
   private scheduleShooting() {

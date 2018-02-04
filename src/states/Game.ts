@@ -60,9 +60,6 @@ export default class Game extends Phaser.State {
       plantAsset: 'plant',
     };
 
-    const plant = new Plant(this, 100, 100, plantData);
-    this.plants.add(plant);
-
     this.sunGenerationTimer = this.game.time.create(false);
     this.sunGenerationTimer.start();
     this.scheduleSunGeneration();
@@ -184,14 +181,14 @@ export default class Game extends Phaser.State {
     this.plantLabel = this.add.text(300, this.game.height - 28, '', style);
   }
 
-  private createPlant(x: number, y: number, data: IPlantData) {
+  private createPlant(x: number, y: number, data: IPlantData, patch: Phaser.Sprite) {
     let newElement: Plant = this.plants.getFirstDead();
 
     if (!newElement) {
-      newElement = new Plant(this, x, y, data);
+      newElement = new Plant(this, x, y, data, patch);
       this.plants.add(newElement);
     } else {
-      newElement.resetData(x, y, data);
+      newElement.resetData(x, y, data, patch);
     }
 
     return newElement;
@@ -229,7 +226,15 @@ export default class Game extends Phaser.State {
   }
 
   private plantPlant(patch: Phaser.Sprite) {
-    console.log('Plant plant check');
+    if (!patch.data.isBusy && this.currentSelection) {
+      patch.data.isBusy = true;
+
+      const plant = this.createPlant(patch.x + patch.width / 2, patch.y + patch.height / 2,
+        this.currentSelection, patch);
+
+      this.increaseSun(-this.currentSelection.cost);
+      this.clearSelection();
+    }
   }
 
   private scheduleSunGeneration() {
