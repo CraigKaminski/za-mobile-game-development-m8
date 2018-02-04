@@ -13,6 +13,7 @@ export default class Game extends Phaser.State {
   private currentSelection: any;
   private hitSound: Phaser.Sound;
   private numSuns = 100;
+  private patches: Phaser.Group;
   private plantLabel: Phaser.Text;
   private plants: Phaser.Group;
   private sunGenerationTimer: Phaser.Timer;
@@ -30,6 +31,8 @@ export default class Game extends Phaser.State {
 
   public create() {
     this.background = this.add.sprite(0, 0, 'background');
+
+    this.createLandPatches();
 
     this.bullets = this.add.group();
     this.plants = this.add.group();
@@ -130,6 +133,29 @@ export default class Game extends Phaser.State {
     }
   }
 
+  private createLandPatches() {
+    this.patches = this.add.group();
+
+    const rectangle = this.add.bitmapData(40, 50);
+    rectangle.ctx.fillStyle = '#000';
+    rectangle.ctx.fillRect(0, 0, 40, 50);
+
+    let patch: Phaser.Sprite;
+    let dark = false;
+
+    for (let i = 0; i < 10; i++) {
+      for (let j = 0; j < 5; j++) {
+        patch = new Phaser.Sprite(this.game, 64 + i * 40, 24 + j * 50, rectangle);
+        this.patches.add(patch);
+        patch.alpha = dark ? 0.2 : 0.1;
+        dark = !dark;
+
+        patch.inputEnabled = true;
+        patch.events.onInputDown.add(this.plantPlant, this);
+      }
+    }
+  }
+
   private createGui() {
     const sun = this.add.sprite(10, this.game.height - 20, 'sun');
     sun.anchor.setTo(0.5);
@@ -200,6 +226,10 @@ export default class Game extends Phaser.State {
     bullet.kill();
     this.hitSound.play();
     zombie.damage(1);
+  }
+
+  private plantPlant(patch: Phaser.Sprite) {
+    console.log('Plant plant check');
   }
 
   private scheduleSunGeneration() {
