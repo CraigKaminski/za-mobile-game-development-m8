@@ -17,7 +17,7 @@ export default class Game extends Phaser.State {
   private levelData: any;
   private nextEnemyTimer: Phaser.TimerEvent;
   private numEnemies: number;
-  private numSuns = 100;
+  private numSuns = 1000;
   private patches: Phaser.Group;
   private plantLabel: Phaser.Text;
   private plants: Phaser.Group;
@@ -228,6 +228,14 @@ export default class Game extends Phaser.State {
     bullet.kill();
     this.hitSound.play();
     zombie.damage(1);
+
+    if (!zombie.alive) {
+      this.killedEnemies++;
+
+      if (this.killedEnemies === this.numEnemies) {
+        this.state.start('Game', true, false, this.levelData.nextLevel);
+      }
+    }
   }
 
   private loadLevel() {
